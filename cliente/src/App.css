@@ -15,7 +15,7 @@ body{
 
 .formulario-container{
   width: 600px;
-  height: 70%;
+  min-height: 70%;
   box-sizing: border-box;
   border: 1px solid rgba(0, 0, 0, 0.294);
   padding: 50px;
@@ -28,10 +28,9 @@ body{
 .formulario-form{
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   width: 100%;
 }
-
 
 .formulario-input{
   padding: 8px;
@@ -53,12 +52,40 @@ body{
 
 .formularios_header{
   width: 100%;
-  padding: 10px 20px;
+  height: 50px;
   box-sizing: border-box;
-  border-bottom: 1px solid black;
+  padding: 0px 20px;
+  border-bottom: 1px solid rgb(174, 174, 174);
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+.formularios_main{
+  height: calc(100% - 51px);
+  display: flex;
+  flex-direction: row;
+}
+
+.formularios_aside{
+  height: 100%;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 20px 0px;
+  gap: 10px;
+  background-color: rgba(232, 232, 232, 0.244);
+
+}
+
+.formularios_content{
+  height: 100%;
+  width: calc(100% - 350px);
+  box-sizing: border-box;
+  padding: 20px;
 }
 
 .formularios_box_info{
@@ -86,4 +113,48 @@ body{
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+
+.overlay{
+  background-color: rgba(0, 0, 0, 0.221);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+}
+
+.modal{
+  height: 80%;
+  width: 70%;
+  background-color: white;
+  position: relative;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+}
+
+
+.modal_btn{
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+
+.modal_detail_header{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  box-sizing: border-box;
+  align-items: center;
 }

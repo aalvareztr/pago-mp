@@ -44,8 +44,8 @@ const Formulario = () => {
           <img style={{height:"200px",objectFit:"cover"}} src={logo}/>
           <form className='formulario-form' onSubmit={HanldeSubmit}>
             <input onChange={(e)=>{setData({...data,rut:e.target.value})}} className='formulario-input' type='text' placeholder='rut'/>
-            <input onChange={(e)=>{setData({...data,password:e.target.value})}} className='formulario-input' type='password' placeholder='contrasena'/>
-            <button className='formulario-boton' type='submit'>Enviar</button>
+            <input onChange={(e)=>{setData({...data,password:e.target.value})}} className='formulario-input' type='password' placeholder='contraseña'/>
+            <button style={{backgroundColor:"#e01a4f",border:"none",cursor:"pointer",padding:"14px 0px",color:"white",fontWeight:600,borderRadius:7}} className='formulario-boton' type='submit'>Enviar</button>
           </form>
         </div>
       }

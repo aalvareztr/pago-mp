@@ -3,6 +3,6 @@ import mysql from 'mysql2/promise';
 
 config(); // Cargar variables de entorno desde el archivo .env
 
-export const connection = await mysql.createConnection('mysql://969m03n62m2jwedal9x8:pscale_pw_NOR6gMRGBirl0arCM7KBcSGpL0BWC5ci0HWgfk3DEqu@aws.connect.psdb.cloud/miasesordb?ssl={"rejectUnauthorized":true}')
+export const connection = await mysql.createConnection('mysql://4sqxia8cqfonltqwt316:pscale_pw_K47cAGWD7IFMX684idsKcv7zDI4T8aSEkujnmaSSoLr@aws.connect.psdb.cloud/miasesordb?ssl={"rejectUnauthorized":true}')
 
 

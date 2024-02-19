@@ -53,7 +53,9 @@ route.post('/api/create-order',async(req,res)=>{
     console.log(monto)
     console.log(rut)
     console.log(idDoc)
-    
+    const docId = idDoc.replace("/", "-");
+
+
     mercadopago.configure({
       access_token:'TEST-7751939271839112-020915-a237287cb3fb227f4c76437a200ff952-1677027160'
     })
@@ -68,7 +70,7 @@ route.post('/api/create-order',async(req,res)=>{
         }
       ],
       back_urls: { success: 'http://localhost:5173/succesPay' },
-      notification_url: `https://0c05-201-223-242-2.ngrok-free.app/webhook/${monto}/${rut}/${idDoc}`,
+      notification_url: `https://ad20-168-194-204-167.ngrok-free.app/webhook/${monto}/${rut}/${docId}`,
     })
     res.json({ok:true,data:result}).status(200)
 })
@@ -96,21 +98,31 @@ route.post('/webhook/:monto/:rut/:idDoc',async(req,res)=>{
 
 async function registerPay (paymentId,rut,idDoc,monto){
     const data = await mercadopago.payment.findById(paymentId);
-    console.log(data.body);
+    //console.log(data.body);
     const date = new Date()
     
     if(data.body.status === 'approved'){
       try{
         await connection.execute('INSERT INTO pagos_marcados(idCliente,idDoc,bruto,neto,fecha) VALUES (?,?,?,?,?)',[rut,idDoc,monto,monto,`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`])
-
+        const idDocOf = idDoc.replace("-", "/")
         //Aca deberia ir el socket
-
+        io.emit('pegoRegister', {idDocOf,status:"apro"});
       }catch(err){
         console.log(err)
       }
     }
 }
 
+
+route.get('/api/test',async(req,res)=>{
+  try{
+    setTimeout(() => {
+      
+    }, 3000);
+  }catch(err){
+    return res.status(400).json({message:err})
+  }
+})
 
 
 export default route

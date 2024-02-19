@@ -8,16 +8,19 @@ import { AppContext } from '../context/AppContext'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import FacturasCliente from './screens/FacturasCliente'
 import FacturaView from './screens/FacturaView'
+import io from 'socket.io-client'
+
+const socket = io("http://localhost:4000")
 
 function App() {
-  //aca va toda la parte de el auth
 
-  const { setAuth,auth } = useContext(AppContext);
+  const { setAuth,auth } = useContext(AppContext);  
 
   return (
     <>
       <main className='main'>
         {
+          
           auth === false ?
           <Routes>
             <Route path='/' element={<Formulario/>} />
@@ -29,6 +32,7 @@ function App() {
             <Route path='/facturacion/vista/:id' element={<FacturaView/>}/>
             <Route path='/*' element={<Navigate to='/profile'/>}/>
           </Routes>
+        
         }
       </main>
     </>
