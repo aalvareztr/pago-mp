@@ -23,7 +23,7 @@ const Formulario = () => {
   async function get_data(){
     setLoading(true)
     try{
-      const response = await axios.post('http://localhost:4000/api/form',data)
+      const response = await axios.post('https://backend-mp-jgj8.onrender.com/api/form',data)
       setClientData(response.data.data)
       setPagos(response.data.pagos)
       setAuth(true)

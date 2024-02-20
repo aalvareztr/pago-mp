@@ -3,7 +3,7 @@ import http from 'http';
 import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
 import AppRoutes from './src/routes/routes.js'
-
+import 'dotenv/config'
 
 const app = express()
 const server = http.createServer(app)
@@ -26,4 +26,5 @@ io.on('connection', socket => {
 })
 
 server.listen(4000)
+
 console.log(`server running on port ${4000}`)

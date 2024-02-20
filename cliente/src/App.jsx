@@ -10,7 +10,7 @@ import FacturasCliente from './screens/FacturasCliente'
 import FacturaView from './screens/FacturaView'
 import io from 'socket.io-client'
 
-const socket = io("http://localhost:4000")
+const socket = io("https://backend-mp-jgj8.onrender.com/")
 
 function App() {
 

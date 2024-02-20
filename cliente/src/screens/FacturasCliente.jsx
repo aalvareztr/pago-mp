@@ -5,17 +5,19 @@ import { FaBuilding } from 'react-icons/fa6';
 import io from 'socket.io-client';
 import { AppContext } from '../../context/AppContext';
 import ModalFact from '../components/ModalFact';
+import ModalSucces from '../components/ModalSucces';
 
 
 const FacturasCliente = () => {
   const [ modal,setModal ] = useState(false)
+  const [ modalCheck,setModalCheck ] = useState(false)
   const [loading, setLoading] = useState(false);
-  const { clientData, pagos, facturas, setFacturas } = useContext(AppContext); // Corregido: Corregir el nombre de setFacutras a setFacturas
-
+  const { clientData, pagos, facturas, setFacturas, selectedElement, setSelectedElement } = useContext(AppContext); // Corregido: Corregir el nombre de setFacutras a setFacturas
+  
   async function pay(data) {
     console.log('mandando');
     try {
-      const response = await axios.post('http://localhost:4000/api/create-order', data);
+      const response = await axios.post('https://backend-mp-jgj8.onrender.com/api/create-order', data);
       console.log(response);
       console.log(response.data.data.body.init_point);
       window.open(`${response.data.data.body.init_point}`, '_blank');
@@ -60,8 +62,8 @@ const FacturasCliente = () => {
   }, []);
 
   useEffect(() => {
-    const socket = io('http://localhost:4000');
-    socket.on('pagoRegister', data => {
+    const socket = io('https://backend-mp-jgj8.onrender.com/');
+    socket.on('pegoRegister', data => {
       console.log('Se recibió un evento de pago registrado:', data);
       console.log('facturas', facturas);
       const updateFacturas = facturas.map(item => {
@@ -74,12 +76,24 @@ const FacturasCliente = () => {
         return item;
       });
       console.log(updateFacturas);
-      setFacturas(updateFacturas); // Corregido: Llamando a setFacturas en lugar de setFacutras
+      setModalCheck(true)
+      setFacturas(updateFacturas);
     });
     return () => {
       socket.disconnect();
     };
-  }, [facturas]); // Corregido: Añadiendo facturas como dependencia del useEffect
+  }, [facturas]); 
+
+  useEffect(() => {
+    const socket = io('https://backend-mp-jgj8.onrender.com/');
+    socket.on('pegoRegister', data => {
+      console.log('Se recibió un evento de pago registrado:', data);
+      setModalCheck(true)
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, []); 
 
   const columns = [
     {
@@ -109,7 +123,11 @@ const FacturasCliente = () => {
       key: 'acciones',
       render: (text, record) => (
         <>
-          <Button type="primary">Ver</Button>
+          <Button type="primary" onClick={()=>{
+            console.log(record)
+            setSelectedElement(record)
+            setModal(true)          
+          }}>Ver</Button>
           {record.pagada === false ? (
             <Button
               style={{ marginLeft: 10 }}
@@ -150,7 +168,10 @@ const FacturasCliente = () => {
               loading === true ?
               <div>Cargando facturas...</div>
               :
-              <Table dataSource={facturas} columns={columns} />
+              <>
+                <div>Selector de facturas</div>
+                <Table dataSource={facturas} columns={columns} />
+              </>
             }
           </div>
         </div>
@@ -158,6 +179,12 @@ const FacturasCliente = () => {
       {
         modal === true ? 
         <ModalFact setModal={setModal}/>
+        :
+        <></>
+      }
+      {
+        modalCheck === true ?
+        <ModalSucces setModalCheck={setModalCheck}/>
         :
         <></>
       }
