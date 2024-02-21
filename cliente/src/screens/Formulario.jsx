@@ -24,7 +24,10 @@ const Formulario = () => {
     setLoading(true)
     try{
       const response = await axios.post('https://backend-mp-jgj8.onrender.com/api/form',data)
-      setClientData(response.data.data)
+      console.log('resouesta de render')
+      console.log(response)
+      console.log(response.data.data[0])
+      setClientData(response.data.data[0])
       setPagos(response.data.pagos)
       setAuth(true)
     }catch(err){

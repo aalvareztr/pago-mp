@@ -1,7 +1,17 @@
 import { Table } from 'antd'
-import React from 'react'
+import AppContext from 'antd/es/app/context'
+import React, { useContext, useEffect } from 'react'
 
 const ModalFact = ({setModal,data}) => {
+  const {clientData,selectedElement} = useContext(AppContext);
+
+  useEffect(() => {
+    console.log('daots')
+    console.log(clientData)
+    console.log('elemento seleccionado LPM')
+    console.log(selectedElement)
+    console.log('data')
+  }, [clientData, selectedElement])
   
   return (
     <div className='overlay'>
@@ -10,17 +20,22 @@ const ModalFact = ({setModal,data}) => {
           <h2>Factura exenta</h2>
           <div className='modal_detail_header'>
             <div style={{display:"flex",flexDirection:"column",gap:7}}>
-              <span>Facturar a</span>
-              <span>Nombre cliente</span>
-              <span>Rut</span>
-              <span>Direccion</span>
+              <span>Facturar a </span>
+              {
+                /*
+                <span>{clientData.razon_social}</span>
+                <span>RUT {clientData.rut}</span>
+                <span>Direccion {clientData.domicilio}</span>
+                
+                <span># Documento: {data.id}</span>
+                <span>Fecha: </span>
+                <span>Vencimiento: {data.vencimiento}</span>
+                <span>C. de pago: {data.condicion}</span>
+                */
+              }
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:7}}>
-              <span># Documento: 12007</span>
-              <span>Fecha: 15/02/2024</span>
-              <span>Vencimiento: 16/02/2024</span>
-              <span>C. de pago: Contado contra entrega</span>
-              <span>Vendedor: Gonzalo Artero</span>
+              <span>Vendedor: - </span>
               <span>Centro de beneficio: Ventas</span>
               <span>Bodega: Default</span>
             </div>

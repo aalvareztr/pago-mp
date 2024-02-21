@@ -1,3 +1,5 @@
+
+
 import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, Table } from 'antd';
@@ -6,13 +8,17 @@ import io from 'socket.io-client';
 import { AppContext } from '../../context/AppContext';
 import ModalFact from '../components/ModalFact';
 import ModalSucces from '../components/ModalSucces';
-
+import logo from '../assets/mi-asesor-logo.png'
+import { useNavigate } from 'react-router-dom';
 
 const FacturasCliente = () => {
   const [ modal,setModal ] = useState(false)
   const [ modalCheck,setModalCheck ] = useState(false)
   const [loading, setLoading] = useState(false);
-  const { clientData, pagos, facturas, setFacturas, selectedElement, setSelectedElement } = useContext(AppContext); // Corregido: Corregir el nombre de setFacutras a setFacturas
+
+  const [ selectedItem,setSelectedItem ] = useState(null)
+
+  const { clientData, pagos, facturas, setFacturas, selectedElement, setSelectedElement,setAuth } = useContext(AppContext); // Corregido: Corregir el nombre de setFacutras a setFacturas
   
   async function pay(data) {
     console.log('mandando');
@@ -30,10 +36,14 @@ const FacturasCliente = () => {
     setLoading(true);
     console.log('empezando la peticion');
     try {
-      const response = await axios.post('https://wecomglobal.pythonanywhere.com/api/pago', { rut: '778639556' });
+      //respuesta del scraping de Mage
+      const response = await axios.post('https://wecomglobal.pythonanywhere.com/api/pago', { rut: clientData.rut });
+      console.log('respuesta de python')
       console.log(response);
+
+      //Update Data para transformarla
       const updateData = response.data.factura_y_monto_por_cliente.map((item, index) => {
-        return { key: index, id: item.factura, vencimiento: item.vencimiento, bruto: item.monto, neto: item.monto };
+        return { key: index, id: item.factura, vencimiento: item.vencimiento, bruto: item.monto, neto: item.monto,condicion: item.condicion_pago, detalle: item.detalle, dias_atraso: item.vencido_hace };
       });
 
       let totalResults = [];
@@ -48,7 +58,7 @@ const FacturasCliente = () => {
           totalResults.push(factura_no_pagada);
         }
       });
-      setFacturas(totalResults); // Corregido: Llamando a setFacturas en lugar de setFacutras
+      setFacturas(totalResults); 
     } catch (err) {
       console.log(err);
     } finally {
@@ -105,6 +115,32 @@ const FacturasCliente = () => {
       title: 'Vencimiento',
       dataIndex: 'vencimiento',
       key: 'vencimiento',
+      render: (text, record) => (
+        <>
+          <div>{text}</div> 
+          <div 
+            style={
+              record.dias_atraso >= 30 ?
+              {padding:"2px 8px", marginTop:5,backgroundColor:"green",color:"black",width:"fit-content",borderRadius: 5}
+              :
+              (
+                record.dias_atraso < 0 ?
+                {padding:"2px 8px", marginTop:5,backgroundColor:"red",color:"white",width:"fit-content",borderRadius: 5}
+                :
+                {padding:"2px 8px", marginTop:5,backgroundColor:"yellow",color:"black",width:"fit-content",borderRadius: 5}
+              )
+            }
+          >
+            {record.dias_atraso} dias
+          </div>
+          
+        </>
+      )
+    },
+    {
+      title: 'Detalle',
+      dataIndex: 'detalle',
+      key: 'detalle',
     },
     {
       title: 'Bruto',
@@ -121,13 +157,21 @@ const FacturasCliente = () => {
     {
       title: 'Acciones',
       key: 'acciones',
+      fixed: 'right',
+      width: 100,
       render: (text, record) => (
-        <>
-          <Button type="primary" onClick={()=>{
-            console.log(record)
-            setSelectedElement(record)
-            setModal(true)          
-          }}>Ver</Button>
+        <> 
+          {
+            /*
+            
+            <Button type="primary" onClick={()=>{
+              setSelectedItem(record);
+              setSelectedElement({rut: record.id});
+              
+              setModal(true);
+            }}>Ver</Button>
+            */
+          }
           {record.pagada === false ? (
             <Button
               style={{ marginLeft: 10 }}
@@ -139,38 +183,44 @@ const FacturasCliente = () => {
               Pagar
             </Button>
           ) : (
-            <></>
+            <><div style={{width:"fit-content", padding:"5px 10px", backgroundColor:"green"}}>Pagada</div></>
           )}
         </>
       ),
     },
   ];
 
+  const navigate = useNavigate();
 
   return (
     <>
       <div className='main_formularios'>
         <div className='formularios_header'>
-          <div>Salir</div>
+          <div onClick={()=>{
+            setAuth(false)
+            navigate('/')
+          }}>Salir</div>
         </div>
         <div className='formularios_main'>
           <aside className='formularios_aside'>
-            <div style={{height:70,width:70,backgroundColor:"#e01a4f",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}>
-              <FaBuilding fontSize={34} color='#f8b133'/>
+            <div style={{height:80,width:80,backgroundColor:"white",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}>
+              <img style={{height:60}} src={logo}/>
             </div>
+            
             <div style={{width:"fit-content"}}><span style={{fontWeight:700}}>Nombre razon social:</span> {clientData.razon_social}</div>  
             <div style={{width:"fit-content"}}><span style={{fontWeight:700}}>Rut</span> {clientData.rut} </div>
             <div style={{width:"fit-content"}}><span style={{fontWeight:700}}>Correo</span> {clientData.mail}</div>
           </aside>
           <div className='formularios_content'>
-            <h1>Facturas pendientes de pago</h1>
+            <h1 className='formularios_content-ttl'>Facturas pendientes de pago</h1>
             {
               loading === true ?
-              <div>Cargando facturas...</div>
+              <div style={{height:300,width:"100%",display:"flex", alignItems:"center",justifyContent:"center"}}>
+                <div className='loading_spinner' style={{height:"40px", width:"40px"}}></div>
+              </div>
               :
               <>
-                <div>Selector de facturas</div>
-                <Table dataSource={facturas} columns={columns} />
+                <Table dataSource={facturas} columns={columns} scroll={{ x: 1200 }}/>
               </>
             }
           </div>
@@ -178,7 +228,7 @@ const FacturasCliente = () => {
       </div>
       {
         modal === true ? 
-        <ModalFact setModal={setModal}/>
+        <ModalFact setModal={setModal} data={selectedItem}/>
         :
         <></>
       }
@@ -193,4 +243,7 @@ const FacturasCliente = () => {
 }
 
 export default FacturasCliente
+
+
+
 

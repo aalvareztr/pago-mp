@@ -18,23 +18,26 @@ route.get('/',async(req,res)=>{
 route.post('/api/form',async(req,res)=>{
     const { rut,password } = req.body;
     try{
-        const __dirname = path.dirname(new URL(import.meta.url).pathname);
-        const filePath = path.resolve(__dirname, 'data.json');
-        const data = await fs.readFile(filePath, 'utf8');
-        const jsonData = JSON.parse(data);
+        //const __dirname = path.dirname(new URL(import.meta.url).pathname);
+        //const filePath = path.resolve(__dirname, 'data.json');
+        //const data = await fs.readFile(filePath, 'utf8');
+        //const jsonData = JSON.parse(data);
 
-        const findClient = jsonData.find((item)=>item.rut === rut && item.clave_si === password)
-        if(findClient){
-            const [pagos] = await connection.execute('SELECT * FROM pagos_marcados WHERE idCliente = ?',[rut]);
-            return res
-            .status(200)
-            .json({ok:true,data:findClient,pagos})
+        //const findClient = jsonData.find((item)=>item.rut === rut && item.clave_si === password)
+        const [findClient] = await connection.execute(`SELECT * FROM clientes WHERE rut = "${rut}" AND clave = "${password}"`)
+        //console.log(findClient)
+        //console.log(findClient.length)
+        if(findClient.length === 1){
+          const [pagos] = await connection.execute('SELECT * FROM pagos_marcados WHERE idCliente = ?',[rut]);
+          return res
+          .status(200)
+          .json({ok:true,data:findClient,pagos})
         }else{
-            return res
-            .status(400)
-            .json({ok:false,code:1,message:'ruto o contrasena incorrectos'})
+          return res
+          .status(400)
+          .json({ok:false,code:1,message:'ruto o contrasena incorrectos'})
         }
-
+        
     }catch(err){
         console.log(err)
         return res
