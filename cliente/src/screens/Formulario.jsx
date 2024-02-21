@@ -4,6 +4,9 @@ import LoadingScreen from './LoadingScreen'
 import { AppContext } from '../../context/AppContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { BsKeyFill } from "react-icons/bs";
+
+
 const Formulario = () => {
 
   const {setAuth,clientData,setClientData,pagos,setPagos} = useContext(AppContext);
@@ -23,7 +26,8 @@ const Formulario = () => {
   async function get_data(){
     setLoading(true)
     try{
-      const response = await axios.post('https://backend-mp-jgj8.onrender.com/api/form',data)
+      const rut = data.rut.replace("-","")
+      const response = await axios.post('https://backend-mp-jgj8.onrender.com/api/form',{rut:rut,password:""})
       console.log('resouesta de render')
       console.log(response)
       console.log(response.data.data[0])
@@ -46,9 +50,12 @@ const Formulario = () => {
         <div className='formulario-container'>
           <img style={{height:"200px",objectFit:"cover"}} src={logo}/>
           <form className='formulario-form' onSubmit={HanldeSubmit}>
-            <input onChange={(e)=>{setData({...data,rut:e.target.value})}} className='formulario-input' type='text' placeholder='rut'/>
-            <input onChange={(e)=>{setData({...data,password:e.target.value})}} className='formulario-input' type='password' placeholder='contraseña'/>
-            <button style={{backgroundColor:"#e01a4f",border:"none",cursor:"pointer",padding:"14px 0px",color:"white",fontWeight:600,borderRadius:7}} className='formulario-boton' type='submit'>Enviar</button>
+            <input onChange={(e)=>{setData({...data,rut:e.target.value})}} className='formulario-input' type='text' placeholder='Ingrese su RUT'/>
+            <button style={{backgroundColor:"#e01a4f",border:"none",cursor:"pointer",padding:"6px 0px",color:"white",fontWeight:600,borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center", gap:6}} className='formulario-boton' type='submit'>
+              <BsKeyFill style={{fontSize:30, color:"white"}}/>
+              <span>INGRESAR</span>
+            </button>
+            
           </form>
         </div>
       }

@@ -208,4 +208,17 @@ body{
   .formularios_content-ttl{
     text-align: center;
   }
+
+
+  .formulario-container{
+    width: 75%;
+    min-height: 70%;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.294);
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }

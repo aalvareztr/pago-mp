@@ -10,23 +10,38 @@ import ModalFact from '../components/ModalFact';
 import ModalSucces from '../components/ModalSucces';
 import logo from '../assets/mi-asesor-logo.png'
 import { useNavigate } from 'react-router-dom';
+import { FaCheckCircle } from "react-icons/fa";
+import { BiSolidMessageAltError } from "react-icons/bi";
+import { BiSolidErrorCircle } from "react-icons/bi";
+
 
 const FacturasCliente = () => {
   const [ modal,setModal ] = useState(false)
   const [ modalCheck,setModalCheck ] = useState(false)
   const [loading, setLoading] = useState(false);
-
+  /////
+  const [ error,setError ] = useState(false);
+  ////
   const [ selectedItem,setSelectedItem ] = useState(null)
 
   const { clientData, pagos, facturas, setFacturas, selectedElement, setSelectedElement,setAuth } = useContext(AppContext); // Corregido: Corregir el nombre de setFacutras a setFacturas
   
   async function pay(data) {
     console.log('mandando');
+    
     try {
       const response = await axios.post('https://backend-mp-jgj8.onrender.com/api/create-order', data);
       console.log(response);
       console.log(response.data.data.body.init_point);
-      window.open(`${response.data.data.body.init_point}`, '_blank');
+      //window.open(`${response.data.data.body.init_point}`, '_blank');
+      const isMobileSafari = /iPhone|iPad|iPod/i.test(navigator.userAgent) && /Safari/i.test(navigator.userAgent);
+      if (isMobileSafari) {
+        // En Safari móvil, redirigir la página en lugar de abrir una nueva ventana
+        window.location.href = response.data.data.body.init_point;
+      } else {
+        // En otros navegadores, abrir una nueva ventana
+        window.open(response.data.data.body.init_point, '_blank');
+      }
     } catch (err) {
       console.log(err);
     }
@@ -35,6 +50,13 @@ const FacturasCliente = () => {
   async function get_data() {
     setLoading(true);
     console.log('empezando la peticion');
+    /*
+    setTimeout(() => {
+      setError(true)
+      setLoading(false)
+    }, 3000);
+    */
+    
     try {
       //respuesta del scraping de Mage
       const response = await axios.post('https://wecomglobal.pythonanywhere.com/api/pago', { rut: clientData.rut });
@@ -58,19 +80,24 @@ const FacturasCliente = () => {
           totalResults.push(factura_no_pagada);
         }
       });
-      setFacturas(totalResults); 
+      setError(false) 
+      setFacturas(totalResults);
     } catch (err) {
       console.log(err);
+      setError(true)
     } finally {
       console.log('peticion terminada');
       setLoading(false);
     }
+    
   }
 
   useEffect(() => {
     get_data();
   }, []);
 
+
+  //socket
   useEffect(() => {
     const socket = io('https://backend-mp-jgj8.onrender.com/');
     socket.on('pegoRegister', data => {
@@ -93,7 +120,7 @@ const FacturasCliente = () => {
       socket.disconnect();
     };
   }, [facturas]); 
-
+  //socket
   useEffect(() => {
     const socket = io('https://backend-mp-jgj8.onrender.com/');
     socket.on('pegoRegister', data => {
@@ -183,7 +210,11 @@ const FacturasCliente = () => {
               Pagar
             </Button>
           ) : (
-            <><div style={{width:"fit-content", padding:"5px 10px", backgroundColor:"green"}}>Pagada</div></>
+            <><div style={{width:"fit-content", padding:"5px 10px", display:"flex",alignItems:"center",gap:7}}>
+                <span>Pagada</span>
+                <FaCheckCircle style={{fontSize:14,color:"green"}}/>
+              </div>
+            </>
           )}
         </>
       ),
@@ -220,7 +251,16 @@ const FacturasCliente = () => {
               </div>
               :
               <>
-                <Table dataSource={facturas} columns={columns} scroll={{ x: 1200 }}/>
+                {
+                  error === true ?
+                  <div style={{width:"100%",boxSizing:"border-box",padding:30,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+                    <BiSolidErrorCircle style={{fontSize:50,color:"#EF4040"}}/>
+                    <h3>¡Ocurrió un error!</h3>
+                    <button style={{padding:"7px 20px",backgroundColor:"#FFA732",border:"none",cursor:"pointer",borderRadius:30}} onClick={()=>{get_data()}}>Volver a intentar</button>
+                  </div>
+                  :
+                  <Table dataSource={facturas} columns={columns} scroll={{ x: 1200 }}/>
+                }
               </>
             }
           </div>
